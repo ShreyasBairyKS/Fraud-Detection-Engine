@@ -1,0 +1,91 @@
+# ─────────────────────────────────────────────────
+# Fraud Detection Engine — Docker Compose (Dev)
+# ─────────────────────────────────────────────────
+# Usage:
+#   docker-compose up -d        # start all containers
+#   docker-compose logs -f      # tail logs
+#   docker-compose down -v      # stop + remove volumes
+# ─────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+  # ── Neo4j Graph Database ───────────────────────
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: fraud-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt protocol
+    environment:
+      - NEO4J_AUTH=neo4j/fraud_detection_dev
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_memory_heap_max__size=512m
+      - NEO4J_dbms_memory_pagecache_size=256m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "fraud_detection_dev", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis (Streams + Cache + Blocklist) ────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: fraud-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── Jenkins CI/CD ──────────────────────────────
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: fraud-jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"    # Jenkins web UI
+      - "50000:50000"  # Agent connections
+    environment:
+      - JAVA_OPTS=-Xmx512m
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ── RedisInsight (Optional — Redis GUI) ────────
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: fraud-redis-insight
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+    profiles:
+      - tools
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  redis_data:
+    driver: local
+  jenkins_data:
+    driver: local

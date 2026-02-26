@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────
+# Fraud Detection Engine — .gitignore
+# ─────────────────────────────────────────────────
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Docker volumes
+neo4j_data/
+redis_data/
+jenkins_data/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+
+# Misc
+*.tmp
+*.bak

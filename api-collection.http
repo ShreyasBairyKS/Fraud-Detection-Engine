@@ -1,0 +1,136 @@
+### ─────────────────────────────────────────────
+### Fraud Detection Engine — REST Client Collection
+### Works with VS Code REST Client extension
+### ─────────────────────────────────────────────
+
+@baseUrl = http://localhost:3000
+@authUrl = http://localhost:3001
+@token = {{login.response.body.token}}
+
+### ═══════════════════════════════════════════════
+### HEALTH CHECKS
+### ═══════════════════════════════════════════════
+
+### API Gateway Health
+GET {{baseUrl}}/health
+
+###
+
+### Auth Service Health
+GET {{authUrl}}/health
+
+###
+
+### ═══════════════════════════════════════════════
+### AUTHENTICATION
+### ═══════════════════════════════════════════════
+
+### Register New User
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "analyst1",
+  "email": "analyst1@example.com",
+  "password": "securePass123"
+}
+
+###
+
+### Login (Admin) — saves token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+###
+
+### Verify Token
+GET {{baseUrl}}/api/auth/verify
+Authorization: Bearer {{token}}
+
+###
+
+### Get Current User
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+###
+
+### ═══════════════════════════════════════════════
+### TRANSACTIONS (Phase 2)
+### ═══════════════════════════════════════════════
+
+### Submit Transaction — Normal
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "accountId": "ACC-001",
+  "amount": 29.99,
+  "currency": "USD",
+  "merchantId": "MERCH-005",
+  "deviceId": "DEV-001",
+  "ipAddress": "192.168.1.100"
+}
+
+###
+
+### Submit Transaction — Suspicious (High Amount + VPN)
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "accountId": "ACC-005",
+  "amount": 4999.99,
+  "currency": "USD",
+  "merchantId": "MERCH-003",
+  "deviceId": "DEV-SHARED",
+  "ipAddress": "185.220.101.1"
+}
+
+###
+
+### Submit Transaction — Fraud Ring Member
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "accountId": "ACC-008",
+  "amount": 3200.00,
+  "currency": "USD",
+  "merchantId": "MERCH-004",
+  "deviceId": "DEV-SHARED",
+  "ipAddress": "185.220.101.1"
+}
+
+###
+
+### ═══════════════════════════════════════════════
+### ALERTS & ANALYTICS (Phase 3)
+### ═══════════════════════════════════════════════
+
+### Get All Alerts
+GET {{baseUrl}}/api/alerts
+Authorization: Bearer {{token}}
+
+###
+
+### Risk Summary Analytics
+GET {{baseUrl}}/api/analytics/risk-summary
+Authorization: Bearer {{token}}
+
+###
+
+### Fraud Ring Graph
+GET {{baseUrl}}/api/graph/fraud-rings
+Authorization: Bearer {{token}}
+
+###

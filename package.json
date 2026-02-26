@@ -1,0 +1,41 @@
+{
+  "name": "fraud-detection-engine",
+  "version": "1.0.0",
+  "description": "Real-time fraud detection engine with Neo4j graph analysis, Redis streams, and rule-based scoring",
+  "private": true,
+  "workspaces": [
+    "services/api-gateway",
+    "services/auth-service",
+    "services/transaction-service",
+    "services/graph-sync-service",
+    "services/detection-worker",
+    "services/alert-service"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d && echo 'Stack is running!'",
+    "dev:down": "docker-compose down",
+    "dev:logs": "docker-compose logs -f",
+    "seed": "node scripts/seed-neo4j.js",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "start:gateway": "npm run start --workspace=services/api-gateway",
+    "start:auth": "npm run start --workspace=services/auth-service",
+    "start:transaction": "npm run start --workspace=services/transaction-service",
+    "start:graph-sync": "npm run start --workspace=services/graph-sync-service",
+    "start:detection": "npm run start --workspace=services/detection-worker",
+    "start:alerts": "npm run start --workspace=services/alert-service"
+  },
+  "keywords": [
+    "fraud-detection",
+    "neo4j",
+    "redis",
+    "graph-database",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0"
+  }
+}
