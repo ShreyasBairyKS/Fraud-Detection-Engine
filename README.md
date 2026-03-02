@@ -8,7 +8,7 @@
 
 ```
 ┌──────────────┐     ┌────────────────────┐     ┌─────────────────┐
-│   Client /   │────▶│    API Gateway      │────▶│  Auth Service   │
+│   Client /   │────▶│    API Gateway      │────▶│  Auth Service   │ 
 │   Postman    │     │   (Express + Nginx) │     │  (JWT tokens)   │
 └──────────────┘     └────────┬───────────┘     └─────────────────┘
                               │
